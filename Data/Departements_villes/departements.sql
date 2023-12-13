@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS departement (
   departement_nom_uppercase varchar(255) DEFAULT NULL,
   departement_slug varchar(255) DEFAULT NULL,
   departement_nom_soundex varchar(20) DEFAULT NULL,
-  PRIMARY KEY (departement_id)
+  CONSTRAINT pk_departement_id PRIMARY KEY (departement_id)
 );
 
 --
@@ -119,6 +119,3 @@ INSERT INTO departement (departement_id, departement_code, departement_nom, depa
 (100, '972', 'Martinique', 'MARTINIQUE', 'martinique', 'M6352'),
 (101, '974', 'Réunion', 'RÉUNION', 'reunion', 'R500');
 
-CREATE INDEX idx_departement_slug ON departement(departement_slug);
-CREATE INDEX idx_departement_code ON departement(departement_code);
-CREATE INDEX idx_departement_nom_soundex ON departement(departement_nom_soundex);
