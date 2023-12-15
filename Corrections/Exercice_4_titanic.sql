@@ -71,7 +71,7 @@ GROUP BY tranche_age;
 -- 2ème exemple
 SELECT
     tranche_age,
-    (COUNT(*) * 100.0 / SUM(COUNT(*)) OVER ()) AS pourcentage_passengers
+    (100.0 * COUNT(*) / SUM(COUNT(*)) OVER ()) AS pourcentage_passengers
 FROM (
     SELECT
         CASE
@@ -93,11 +93,11 @@ WITH pas_sur AS (
   FROM titanic_passenger p
   INNER JOIN titanic_survival s ON s.passengerid = p.passengerid
 )
-SELECT sum(survived) * 100.0 / count(*) FROM pas_sur;
+SELECT 100.0 * sum(survived) / count(*) FROM pas_sur;
 
 -- 2ème exemple
 SELECT
-	(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER ()) AS pourcentage_survivants
+	100.0 * COUNT(*) / (SUM(COUNT(*)) OVER ()) AS pourcentage_survivants
 FROM titanic_passenger p
 INNER JOIN titanic_survival s ON s.passengerid = p.passengerid
 GROUP BY s.survived
@@ -109,7 +109,7 @@ WITH stat_sur AS (
   SELECT
 	  s.survived,
     p.pclass,
-	  (COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (PARTITION BY p.pclass)) AS pourcentage_survivants
+	  100.0 * COUNT(*) / (SUM(COUNT(*)) OVER (PARTITION BY p.pclass)) AS pourcentage_survivants
   FROM titanic_passenger p
   INNER JOIN titanic_survival s ON s.passengerid = p.passengerid
   GROUP BY s.survived, p.pclass
@@ -118,6 +118,15 @@ SELECT pclass, pourcentage_survivants
 FROM stat_sur
 WHERE survived = 1
 ORDER BY pclass;
+
+-- 2ème exemple
+SELECT
+	p.pclass,
+	100.0 * SUM(survived) / COUNT(*) AS pourcentage_survivants
+FROM titanic_passenger p
+INNER JOIN titanic_survival s ON s.passengerid = p.passengerid
+GROUP BY p.pclass
+ORDER BY p.pclass;
 
 -- 12- Quelle est la proportion des survivants par tranche d'âge ?
 WITH pas_age AS (
@@ -136,26 +145,26 @@ WITH pas_age AS (
     titanic_survival s ON s.passengerid = p.passengerid
 )
 SELECT 
-  survived,
   tranche_age,
-  (COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (PARTITION BY tranche_age)) AS pourcentage_survivants
+  100.0 * SUM(survived) / COUNT(*) AS pourcentage_survivants
 FROM
   pas_age
 GROUP BY
-  survived,
+  tranche_age
+ORDER BY
   tranche_age;
-    
+
 -- 13- Quelle est la proportion des survivants par genre ?
-SELECT
-    genre,
-    (COUNT(*) FILTER (WHERE s.survived) * 100.0 / COUNT(*)) AS pourcentage_passengers
-FROM (
+WITH passagers AS (
     SELECT
         sex as genre,
-		passengerid
+		    passengerid
     FROM
         titanic_passenger
-) passagers
-INNER JOIN titanic_survival s ON s.passengerid = passagers.passengerid
-GROUP BY
-    genre;
+)
+SELECT
+    genre,
+    100.0 * sum(survived) / count(*) AS "pourcentage survivants"
+FROM passagers p
+INNER JOIN titanic_survival s ON s.passengerid = p.passengerid
+GROUP BY genre;
