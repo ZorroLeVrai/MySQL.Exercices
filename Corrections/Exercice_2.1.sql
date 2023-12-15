@@ -16,13 +16,14 @@ CREATE TABLE IF NOT EXISTS matiere (
 CREATE TABLE IF NOT EXISTS inscription (
   id_eleve INT,
   id_matiere INT,
+  CONSTRAINT pk_inscription_eleve_matiere_id PRIMARY KEY (id_eleve, id_matiere),
   CONSTRAINT fk_sui_mat_eleve FOREIGN KEY(id_eleve) REFERENCES eleve(id),
   CONSTRAINT fk_sui_mat_matiere FOREIGN KEY(id_matiere) REFERENCES matiere(id)
 );
 -- @block
 CREATE TABLE IF NOT EXISTS note (
   id INT AUTO_INCREMENT,
-  score REAL NOT NULL,
+  score DECIMAL(4,2) NOT NULL,
   date DATE,
   libelle_semestre VARCHAR(20) NOT NULL,
   id_matiere INT,
