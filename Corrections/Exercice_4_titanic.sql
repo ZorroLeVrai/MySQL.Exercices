@@ -100,19 +100,14 @@ GROUP BY
 ORDER BY tranche_age;
 
 -- 10- Quelle est la proportion des survivants ?
-WITH pas_sur AS (
-  SELECT
-	  s.survived
-  FROM titanic_passenger p
-  INNER JOIN titanic_survival s ON s.passengerid = p.passengerid
-)
-SELECT 100.0 * sum(survived) / count(*) AS 'taux de survie' FROM pas_sur;
+SELECT
+	  100 * sum(s.survived) / count(*) AS 'taux de survie'
+FROM titanic_survival s;
 
 -- 2ème exemple
 SELECT
 	100.0 * COUNT(*) / (SUM(COUNT(*)) OVER ()) AS pourcentage_survivants
-FROM titanic_passenger p
-INNER JOIN titanic_survival s ON s.passengerid = p.passengerid
+FROM titanic_survival s
 GROUP BY s.survived
 ORDER BY s.survived DESC
 LIMIT 1;
