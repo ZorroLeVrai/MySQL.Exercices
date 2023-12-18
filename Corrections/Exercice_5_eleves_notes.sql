@@ -13,10 +13,13 @@ WHERE prenom = 'Léa'
 	AND nom = 'Benoit';
  
 -- 3- Ajoutez une note à Léa Benoit supérieur à 20 en Allemand (par exemple 25)
+SET @id_note = (SELECT max(id) + 1 FROM notes);
+SET @id_eleve = (SELECT id FROM eleves WHERE prenom = 'Léa' AND nom = 'Benoit');
+SET @id_matiere = (SELECT id FROM matieres WHERE libelle = 'Allemand');
 INSERT INTO notes (id, id_eleve, id_matiere, note)
-VALUES ((SELECT max(id) + 1 FROM notes),
-		(SELECT id FROM eleves WHERE prenom = 'Léa' AND nom = 'Benoit'),
-		(SELECT id FROM matieres WHERE libelle = 'Allemand'),
+VALUES (@id_note,
+		@id_eleve,
+		@id_matiere,
 		25);
  
 -- 2ème exemple
@@ -39,14 +42,11 @@ ALTER TABLE Notes
 ADD CONSTRAINT check_note_range CHECK (note >= 0 AND note <= 20);
 
 -- 6- Modifiez la table `notes` pour que le champ `id` soit généré automatiquement
---Création de la séquence
-CREATE SEQUENCE notes_id_seq START 40020;
+-- Ajout de l'auto_increment
+ALTER TABLE notes MODIFY COLUMN id INT auto_increment;
 
---Modification de la colonne pour utiliser la valeur de la séquence par défaut.
-ALTER TABLE Notes ALTER COLUMN id SET DEFAULT nextval('notes_id_seq');
-
---Associer la séquence à la colonne de la table
-ALTER SEQUENCE notes_id_seq OWNED BY Notes.id;
+-- Commencer l'auto_increment à 40020
+ALTER TABLE notes auto_increment = 40020;
 
 -- 7- Faire en sorte qu’un élève ne puisse avoir qu’une seule note par matière
 ALTER TABLE Notes
@@ -63,9 +63,13 @@ CREATE INDEX idx_notes_id_eleve
 ON notes(id_eleve);
 
 -- 9- Vérifiez maintenant le plan d’exécution de la requête n°4
+SET @@explain_format=TREE;
+
 EXPLAIN DELETE FROM notes
 WHERE id_eleve = (SELECT id FROM eleves WHERE prenom = 'Léa' AND nom = 'Benoit')
 	AND id_matiere = (SELECT id FROM matieres WHERE libelle = 'Allemand');
+
+SET @@explain_format=TRADITIONAL;
   
 -- On peut voir dans le plan d'exécution que les indexes sont utilisés pour récupérer les données
 -- des tables `eleves` et `notes`.
