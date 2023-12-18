@@ -7,6 +7,12 @@ SELECT avg(fare)
 FROM titanic_passenger;
 
 -- 3- Quel passager a payé le billet le plus cher ?
+WITH mf AS (SELECT max(fare) AS max_fare FROM titanic_passenger)
+SELECT p.name, p.fare
+FROM titanic_passenger p
+INNER JOIN mf ON mf.max_fare = p.fare;
+
+-- 2éme exemple
 SELECT p.name, p.fare
 FROM titanic_passenger p
 WHERE fare is not null
@@ -50,6 +56,11 @@ GROUP BY classe
 ORDER BY classe;
 
 -- 8- Quel est le pourcentage de femmes dans la liste des passagers ?
+SELECT 100.0*(SELECT count(*)
+FROM titanic_passenger p
+WHERE p.sex='female') / (SELECT count(*) FROM titanic_passenger) as pourcentage_femme;
+
+-- 2ème exemple
 WITH p AS (
 	SELECT sex
 	FROM titanic_passenger
@@ -66,7 +77,8 @@ SELECT
 	end as tranche_age,
 	100.0*count(*) / (SELECT count(*) FROM titanic_passenger) AS pourcentage_passengers
 FROM titanic_passenger
-GROUP BY tranche_age;
+GROUP BY tranche_age
+ORDER BY tranche_age;
 
 -- 2ème exemple
 SELECT
@@ -84,8 +96,9 @@ FROM (
         titanic_passenger
 ) age_groups
 GROUP BY
-    tranche_age;
-    
+    tranche_age
+ORDER BY tranche_age;
+
 -- 10- Quelle est la proportion des survivants ?
 WITH pas_sur AS (
   SELECT
@@ -93,7 +106,7 @@ WITH pas_sur AS (
   FROM titanic_passenger p
   INNER JOIN titanic_survival s ON s.passengerid = p.passengerid
 )
-SELECT 100.0 * sum(survived) / count(*) FROM pas_sur;
+SELECT 100.0 * sum(survived) / count(*) AS 'taux de survie' FROM pas_sur;
 
 -- 2ème exemple
 SELECT
@@ -155,16 +168,9 @@ ORDER BY
   tranche_age;
 
 -- 13- Quelle est la proportion des survivants par genre ?
-WITH passagers AS (
-    SELECT
-        sex as genre,
-		    passengerid
-    FROM
-        titanic_passenger
-)
 SELECT
-    genre,
+    sex as genre,
     100.0 * sum(survived) / count(*) AS "pourcentage survivants"
-FROM passagers p
+FROM titanic_passenger p
 INNER JOIN titanic_survival s ON s.passengerid = p.passengerid
 GROUP BY genre;

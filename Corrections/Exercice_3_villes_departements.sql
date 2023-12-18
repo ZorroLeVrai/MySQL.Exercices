@@ -58,7 +58,7 @@ WHERE ville_surface > (SELECT AVG(ville_surface) FROM ville);
 WITH v AS (
   SELECT AVG(ville_surface) AS avg_surface FROM ville
 )
-SELECT count(*)
+SELECT ville_nom, ville_surface
 FROM ville, v
 WHERE ville_surface > v.avg_surface;
 
