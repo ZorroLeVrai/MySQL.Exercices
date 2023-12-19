@@ -54,7 +54,7 @@ SELECT ville_nom, ville_surface
 FROM ville 
 WHERE ville_surface > (SELECT AVG(ville_surface) FROM ville);
 
--- 2ème possibilité
+-- 2ème exemple
 WITH v AS (
   SELECT AVG(ville_surface) AS avg_surface FROM ville
 )
@@ -79,3 +79,11 @@ START TRANSACTION;
 
 --ROLLBACK;
 COMMIT;
+
+-- Création d'une table temporaire pour tester la modification
+CREATE TEMPORARY TABLE temp_ville
+SELECT * FROM ville;
+
+UPDATE temp_ville 
+SET ville_nom = REPLACE(ville_nom, '-', ' ') 
+WHERE ville_nom LIKE 'SAINT-%';

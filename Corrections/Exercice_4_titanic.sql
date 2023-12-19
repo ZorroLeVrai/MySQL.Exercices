@@ -7,10 +7,10 @@ SELECT avg(fare)
 FROM titanic_passenger;
 
 -- 3- Quel passager a payé le billet le plus cher ?
-WITH mf AS (SELECT max(fare) AS max_fare FROM titanic_passenger)
+WITH pmf AS (SELECT max(fare) AS max_fare FROM titanic_passenger)
 SELECT p.name, p.fare
 FROM titanic_passenger p
-INNER JOIN mf ON mf.max_fare = p.fare;
+INNER JOIN pmf ON pmf.max_fare = p.fare;
 
 -- 2éme exemple
 SELECT p.name, p.fare
@@ -26,6 +26,13 @@ WHERE pclass = 1
 	AND fare = 0;
 
 -- 5- Quelle personne a obtenu le billet de première classe le moins cher ?
+WITH pmf AS (SELECT min(fare) AS min_fare FROM titanic_passenger WHERE pclass = 1 AND fare > 0)
+SELECT p.name, p.fare
+FROM titanic_passenger p
+INNER JOIN pmf ON pmf.min_fare = p.fare
+WHERE p.pclass = 1;
+
+-- 2éme exemple
 SELECT p.name, p.fare
 FROM titanic_passenger p
 WHERE pclass = 1
@@ -36,6 +43,11 @@ LIMIT 1;
 -- 6.1- Quel est le passager le plus jeune ?
 SELECT p.name, p.age
 FROM titanic_passenger p
+WHERE age = (SELECT min(age) FROM titanic_passenger);
+
+-- 2éme exemple
+SELECT p.name, p.age
+FROM titanic_passenger p
 WHERE age is not null
 ORDER BY age
 LIMIT 1;
@@ -43,9 +55,7 @@ LIMIT 1;
 -- 6.2- Quel est le passager le plus âgé ?
 SELECT p.name, p.age
 FROM titanic_passenger p
-WHERE age is not null
-ORDER BY age DESC
-LIMIT 1;
+WHERE age = (SELECT max(age) FROM titanic_passenger);
 
 -- 7- Quel est le prix moyen des billets de 1ère, 2ème ou 3ème classe ?
 SELECT
@@ -56,16 +66,12 @@ GROUP BY classe
 ORDER BY classe;
 
 -- 8- Quel est le pourcentage de femmes dans la liste des passagers ?
-SELECT 100.0*(SELECT count(*)
-FROM titanic_passenger p
-WHERE p.sex='female') / (SELECT count(*) FROM titanic_passenger) as pourcentage_femme;
+SELECT 100.0*(SELECT count(*) FROM titanic_passenger p WHERE p.sex='female') / (SELECT count(*) FROM titanic_passenger) AS pourcentage_femme;
 
--- 2ème exemple
-WITH p AS (
-	SELECT sex
-	FROM titanic_passenger
-)
-SELECT 100.0*(SELECT count(*) FROM p WHERE p.sex='female') / (SELECT count(*) FROM p) as pourcentage_femme;
+-- 2ème exemple  
+SET @nb_passagers_femmes = (SELECT count(*) FROM titanic_passenger p WHERE p.sex='female');
+SET @nb_passagers = (SELECT count(*) FROM titanic_passenger);
+SELECT (100*@nb_passagers_femmes / @nb_passagers) AS pourcentage_femme;
 
 -- 9- Quel est le pourcentage de passagers par tranche d'âge.
 SELECT
@@ -74,7 +80,7 @@ SELECT
 		WHEN age BETWEEN 10 AND 25 THEN '10-25 ans'
 		WHEN age BETWEEN 25 AND 60 THEN '25-60 ans'
 		ELSE '> 60 ans'
-	end as tranche_age,
+	END AS tranche_age,
 	100.0*count(*) / (SELECT count(*) FROM titanic_passenger) AS pourcentage_passengers
 FROM titanic_passenger
 GROUP BY tranche_age
@@ -106,7 +112,7 @@ FROM titanic_survival s;
 
 -- 2ème exemple
 SELECT
-	100.0 * COUNT(*) / (SUM(COUNT(*)) OVER ()) AS pourcentage_survivants
+	100.0 * COUNT(*) / (SUM(COUNT(*)) OVER ()) AS 'taux de survie'
 FROM titanic_survival s
 GROUP BY s.survived
 ORDER BY s.survived DESC
