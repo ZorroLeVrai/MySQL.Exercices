@@ -73,6 +73,17 @@ SET @nb_passagers_femmes = (SELECT count(*) FROM titanic_passenger p WHERE p.sex
 SET @nb_passagers = (SELECT count(*) FROM titanic_passenger);
 SELECT (100*@nb_passagers_femmes / @nb_passagers) AS pourcentage_femme;
 
+-- 3ème exemple  
+SELECT sex, pourcentage
+FROM (
+	SELECT
+		sex,
+		100*count(*) / (sum(count(*)) OVER ()) as pourcentage
+	from titanic_passenger
+	group by sex ) stats
+WHERE
+	sex = 'female';
+
 -- 9- Quel est le pourcentage de passagers par tranche d'âge.
 SELECT
 	CASE
