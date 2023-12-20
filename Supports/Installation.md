@@ -1,19 +1,5 @@
 ## Procédure d'installation
 
-### En cas de répertoire `/Data` absent
-
-Dans le répertoire principal de MySQL  
-`C:\Program Files (x86)\mysql-8.0.35-winx64`  
-Créez un fichier `my.ini` (ce fichier contiendra la configuration de MySQL).  
-Voici un exemple du contenu du fichier `my.ini`
-
-```ini
-[mysqld]
-basedir="C:\\Program Files (x86)\\mysql-8.0.35-winx64"
-datadir="C:\\Program Files (x86)\\mysql-8.0.35-winx64\\data"
-
-```
-
 ### Si le répertoire `/bin` n'est pas dans le Path
 
 Pour vérifier si le répertoire `/bin` a été ajouté au Path, tapez la commande suivante dans l'invite de commande  
@@ -31,6 +17,20 @@ Une nouvelle fenêtre s'affiche.
 Dans cette fenêtre (dans la partie `Variables Systèmes`), éditez la variable `Path` puis ajoutez le nouveau répertoire à votre liste  
 `C:\Program Files (x86)\mysql-8.0.35-winx64\bin`  
 Puis cliquez sur `OK`. Pour enregistrer vos modifications.
+
+### En cas de répertoire `/Data` absent
+
+Dans le répertoire principal de MySQL  
+`C:\Program Files (x86)\mysql-8.0.35-winx64`  
+Créez un fichier `my.ini` (ce fichier contiendra la configuration de MySQL).  
+Voici un exemple du contenu du fichier `my.ini`
+
+```ini
+[mysqld]
+basedir="C:\\Program Files (x86)\\mysql-8.0.35-winx64"
+datadir="C:\\Program Files (x86)\\mysql-8.0.35-winx64\\data"
+
+```
 
 ### Ouvrez en mode administrateur une nouvelle invite de commande et tapez les commandes suivantes
 
