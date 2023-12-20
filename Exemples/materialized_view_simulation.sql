@@ -66,7 +66,7 @@ BEGIN
 END $$
 DELIMITER ;
 
-/**************************** Tests de la procédure stockées ***************************/
+/**************************** Tests de la procédure stockée ***************************/
 
 -- test d'insertion
 insert into t_data values (default, 'ZZ', 1001);
