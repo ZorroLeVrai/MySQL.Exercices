@@ -23,9 +23,9 @@ ORDER BY v.ville_population_2012 DESC
 LIMIT 10;
 
 -- 5- Obtenir la liste du nom de chaque département, associé à son code et du nombre de commune au sein de ces départements, en triant afin d’obtenir en priorité les départements qui possèdent le plus de communes
-SELECT d.departement_nom, d.departement_code, COUNT(*) AS nb_communes
-FROM ville v
-LEFT JOIN departement d ON d.departement_code = v.ville_departement
+SELECT d.departement_nom, d.departement_code, COUNT(ville_nom) AS nb_communes
+FROM departement d
+LEFT JOIN ville v ON d.departement_code = v.ville_departement
 GROUP BY d.departement_nom, d.departement_code
 ORDER BY nb_communes DESC;
 
